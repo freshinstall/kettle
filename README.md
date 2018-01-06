@@ -32,4 +32,4 @@ Freshinstall uses a standard file using the file extension `.fix`. Despite this,
 /metainfo
   /meta.json
 ```
-`.fix` files can contain extra packages that need to be installed, third-party repositories that need to be enabled, configuration files to set up custom options, source pacakges to include for manual installation, and scripts to run to perform other actions. 
+`.fix` files can contain extra packages that need to be installed, third-party repositories that need to be enabled, configuration files to set up custom options, source packages to include for manual installation, and scripts to run to perform other actions. 
