@@ -1,0 +1,83 @@
+#!/usr/bin/python3
+
+## kettle - Desktop software configuration manager
+# Copyright (c) 2018, freshinstall
+# All rights reserved.
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED “AS IS” AND ISC DISCLAIMS ALL WARRANTIES WITH REGARD 
+# TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS. IN NO EVENT SHALL ISC BE LIABLE FOR  ANY SPECIAL, DIRECT, INDIRECT,
+# OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+# DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+# TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
+# OF THIS SOFTWARE.
+
+import logging, argparse, os
+import  gettext
+_ = gettext.gettext
+
+import action
+
+def create(log, path=None):
+    log.info(_('Creating new kettle: %s' % path))
+    act = action.Action()
+    act.create(path)
+
+def install(log, path=None):
+    log.info(_('Installing kettle: %s' % path))
+    act = action.Action()
+    act.install(path)
+
+def gui(log, path=None):
+    log.info(_('Running the GUI'))
+    log.warning(_('The GUI is not yet implemented, falling back to CLI.'))
+
+def main():
+
+    # Set up some basic logging
+    log = logging.getLogger('kettle')
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+    log.setLevel(logging.DEBUG)
+
+    log.debug(_("Logging set up!"))
+
+    # Argument processing
+    parser = argparse.ArgumentParser(
+                                     prog="kettle",
+                                     description=_('Desktop configuration manager'),
+                                     )
+    parser.add_argument(
+                        'action',
+                        nargs='?',
+                        default='gui',
+                        help=_('What action to do.'),
+                        metavar='COMMAND',
+                        )
+    parser.add_argument(
+                        'file',
+                        nargs='?',
+                        default=os.getcwd(),
+                        help=_('The path to operate with. Defaults to current directory'),
+                        metavar='PATH',
+                        )
+
+
+    args = parser.parse_args()
+
+    action = {"create"  : create,
+              "install" : install,
+              "gui"     : gui,
+    }
+    if args.action:
+        log.info(_('Got command: %s' % args.action))
+        action[args.action](log, path=args.file)
+
+if __name__ == "__main__":
+    main()
