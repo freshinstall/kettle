@@ -1,3 +1,8 @@
+# Other files here:
+
+# Editor TMP files
+*~
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
