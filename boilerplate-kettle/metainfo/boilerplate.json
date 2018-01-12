@@ -1,0 +1,27 @@
+{
+    "name": "Boilerplate Kettle",
+    "author": "Ian Santopietro",
+    "version": "1.0",
+    "standard": 0,
+    "modules": [
+        "binary",
+        "repos",
+        "packages",
+        "src",
+        "config",
+        "lists",
+        "script",
+    ],
+    "permissions": [
+        {
+            "script-root" : true,
+            "sys-config"  : true,
+            "deb-sources" : true,
+            "install-apt" : true,
+            "install-dpkg": true,
+            "remove-pkg"  : true,
+        },
+    ],
+}
+
+
