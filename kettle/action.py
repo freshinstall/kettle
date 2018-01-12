@@ -29,13 +29,11 @@ class Action():
         # Set up some basic logging
         self.log = logging.getLogger('kettle.Action')
         self.log.debug(_("Logging set up!"))
-        print("done")
 
     def create(self, path):
         self.log.debug(_("Starting creation of new kettle:  %s" % path))
 
         # do some stuff
-        print("done")
 
         self.log.debug(_("%s created!" % path))
 
