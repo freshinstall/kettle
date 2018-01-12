@@ -41,7 +41,7 @@ def main():
     # Set up some basic logging
     log = logging.getLogger('kettle')
     handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+    formatter = logging.Formatter('%(asctime)s %(name)-14s %(levelname)-8s %(message)s')
     handler.setFormatter(formatter)
     log.addHandler(handler)
     log.setLevel(logging.DEBUG)
