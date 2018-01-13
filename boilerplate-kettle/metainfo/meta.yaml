@@ -16,8 +16,8 @@ modules: [binary, repos, packages, src, config, lists, scripts]
 permissions: # these are the standard permissions, and MUST be declared in EVERY Kettle
     script-root:  No
     sys-config:   Yes
-    deb sources:  Yes
+    deb-sources:  Yes
     install-apt:  Yes
     install-dpkg: Yes
     remove-pkg:   No
-    
+...
