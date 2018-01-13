@@ -1,0 +1,4 @@
+## Uncommented lines are the names of packages that will be installed from
+## The repositories available on the system or those added by this kettle.
+## This requires the "install-apt" permission
+kettle

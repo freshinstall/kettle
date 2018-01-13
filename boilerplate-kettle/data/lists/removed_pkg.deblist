@@ -1,0 +1,5 @@
+## Uncommented lines are the names of packages that will be removed from
+## the system.
+## This requires the "remove-pkg" permission
+
+kettle

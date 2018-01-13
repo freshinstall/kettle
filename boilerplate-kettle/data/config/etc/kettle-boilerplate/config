@@ -1,0 +1,6 @@
+[Boilerplate Kettle]
+Installed=Yes
+## This is a sample system config file, provided as part of the kettle
+## Boilerplate. This requires the sys-config permission
+
+##It is safe to delete this file.

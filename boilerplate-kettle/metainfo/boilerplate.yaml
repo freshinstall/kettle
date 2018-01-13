@@ -1,0 +1,23 @@
+--- # Sample Kettle metadata
+name: Boilerplate Kettle
+id: boilerplate-kettle
+description: >
+             This is a sample (boilerplate) kettle that installs kettle. If you
+             can install this, it is useless, but it serves as a good template 
+             if you are creating or editing a kettle by hand.
+             
+             Not all fields here are necessary, but all may be included.
+author: Ian Santopietro
+URL: https://github.com/freshinstall/kettle
+email: isantop@gmail.com
+version: "1.0"
+standard: 0
+modules: [binary, repos, packages, src, config, lists, scripts]
+permissions: # these are the standard permissions, and MUST be declared in EVERY Kettle
+    script-root:  No
+    sys-config:   Yes
+    deb sources:  Yes
+    install-apt:  Yes
+    install-dpkg: Yes
+    remove-pkg:   No
+    
