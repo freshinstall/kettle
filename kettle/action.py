@@ -25,10 +25,12 @@ _ = gettext.gettext
 # generic action class
 class Action():
 
-    def __init__(self):
+    def __init__(self, kettle):
         # Set up some basic logging
         self.log = logging.getLogger('kettle.Action')
         self.log.debug(_("Logging set up!"))
+
+        self.kettle = kettle
 
     def create(self, path):
         self.log.debug(_("Starting creation of new kettle:  %s" % path))
@@ -38,8 +40,9 @@ class Action():
         self.log.debug(_("%s created!" % path))
 
     def install(self, path):
-        self.log.debug(_("Starting installation of %s kettle" % path))
+        self.log.debug(_("Starting installation of %s to %s" % (self.kettle.ketid, self.kettle.tmppath)))
 
         # do some stuff
+        self.kettle.extract_kettle(path=path)
 
-        self.log.debug(_("Installed %s" % path))
+        self.log.debug(_("Installed %s" % self.kettle.ketid))

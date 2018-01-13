@@ -20,7 +20,7 @@ import logging, argparse, os
 import  gettext
 _ = gettext.gettext
 
-import action
+import action, ket
 
 def create(log, path=None):
     log.info(_('Creating new kettle: %s' % path))
@@ -28,9 +28,14 @@ def create(log, path=None):
     act.create(path)
 
 def install(log, path=None):
-    log.info(_('Installing kettle: %s' % path))
-    act = action.Action()
-    act.install(path)
+    try:
+        kettle = ket.Kettle(path)
+    except Exception as e:
+        log.exception(e)
+        exit()
+    log.info(_('Installing kettle %s from %s' % (kettle.get_id(), path)))
+    act = action.Action(kettle)
+    act.install(path=kettle.tmppath)
 
 def gui(log, path=None):
     log.info(_('Running the GUI'))
