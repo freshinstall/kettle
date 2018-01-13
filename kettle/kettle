@@ -35,8 +35,7 @@ def extract(log, path=None, extract_dir=None):
         exit()
     log.info(_('Installing kettle %s from %s' % (kettle.get_id(), path)))
     act = action.Action(kettle)
-    if
-    act.extract(path=kettle.tmppath)
+    act.extract(path=extract_dir)
 
 def gui(log, path=None):
     log.info(_('Running the GUI'))
@@ -51,6 +50,7 @@ def main():
     handler.setFormatter(formatter)
     log.addHandler(handler)
     log.setLevel(logging.DEBUG)
+    directory=None
 
     log.debug(_("Logging set up!"))
 
@@ -67,8 +67,14 @@ def main():
     parser.add_argument('file',
                         nargs='?',
                         default=os.getcwd(),
-                        help=_('The path to operate with. Defaults to current directory'),
+                        help=_('The path to operate with. Defaults to current directory.'),
                         metavar='PATH',
+                        )
+    parser.add_argument('-d', '--directory',
+                        default=None,
+                        type=str,
+                        help=_('The directory to extract the kettle to or create it from.'),
+                        dest=directory,
                         )
     args = parser.parse_args()
 
@@ -78,7 +84,11 @@ def main():
     }
     if args.action:
         log.info(_('Got command: %s' % args.action))
-        action[args.action](log, path=args.file)
+        log.debug('Destination is %s' % args.directory)
+        if args.directory == None:
+            action[args.action](log, path=args.file)
+        else:
+            action[args.action](log, path=args.file, extract_dir=args.directory)
 
 if __name__ == "__main__":
     main()

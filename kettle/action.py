@@ -39,11 +39,14 @@ class Action():
 
         self.log.debug(_("%s created!" % path))
 
-    def extract(self, path):
-        self.log.debug(_("Starting installation of %s to %s" % (self.kettle.ketid, self.kettle.tmppath)))
+    def extract(self, path=None):
+        extpath = path
+        if path == None:
+            extpath = self.kettle.tmppath
+        self.log.debug(_("Starting installation of %s to %s" % (self.kettle.ketid, extpath)))
 
         # do some stuff
-        self.kettle.extract_kettle(path=path)
+        self.kettle.extract_kettle(path=extpath)
 
         self.log.debug(_("Installed %s" % self.kettle.ketid))
 
