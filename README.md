@@ -3,7 +3,7 @@
 Kettle is a configuration backup-restore tool for Debian-based OSs like Pop_OS. It uses a standard file format to save data in the system and restore it to another system (or reinstallation). It can also be used for sharing standard configuration environments, such as a video editing setup, Node.js development, etc.
 
 ### File format
-Freshinstall uses a standard file using the file extension `.ket`. Despite this, the file contains a standard tar archive, which makes creating these files by hand very simple. The structure of a `.ket` file is below:
+Kettle files (called 'kettles') use the file extension `.ket`. Despite this, the file contains a standard tar archive, which makes creating these files by hand very simple. The structure of a `.ket` file is below:
 ```
 /
 /data/
