@@ -2,6 +2,16 @@
 
 Kettle is a configuration backup-restore tool for Debian-based OSs like Pop_OS. It uses a standard file format to save data in the system and restore it to another system (or reinstallation). It can also be used for sharing standard configuration environments, such as a video editing setup, Node.js development, etc.
 
+### Installation
+
+For now, Kettle is distributed as a Python Package. To install it, clone the latest github version and use setup.py
+```
+git clone https://github.com/freshinstall/kettles
+cd kettle
+sudo python3 setup.py install
+kettle --help
+```
+
 ### File format
 Kettle files (called 'kettles') use the file extension `.ket`. Despite this, the file contains a standard tar archive, which makes creating these files by hand very simple. The structure of a `.ket` file is below:
 ```
