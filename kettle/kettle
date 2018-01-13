@@ -27,7 +27,7 @@ def create(log, path=None):
     act = action.Create()
     act.create(path)
 
-def extract(log, path=None):
+def extract(log, path=None, extract_dir=None):
     try:
         kettle = ket.Kettle(path)
     except Exception as e:
@@ -35,7 +35,8 @@ def extract(log, path=None):
         exit()
     log.info(_('Installing kettle %s from %s' % (kettle.get_id(), path)))
     act = action.Action(kettle)
-    act.install(path=kettle.tmppath)
+    if
+    act.extract(path=kettle.tmppath)
 
 def gui(log, path=None):
     log.info(_('Running the GUI'))
@@ -54,26 +55,21 @@ def main():
     log.debug(_("Logging set up!"))
 
     # Argument processing
-    parser = argparse.ArgumentParser(
-                                     prog="kettle",
+    parser = argparse.ArgumentParser(prog="kettle",
                                      description=_('Desktop configuration manager'),
                                      )
-    parser.add_argument(
-                        'action',
+    parser.add_argument('action',
                         nargs='?',
                         default='gui',
                         help=_('What action to do.'),
                         metavar='COMMAND',
                         )
-    parser.add_argument(
-                        'file',
+    parser.add_argument('file',
                         nargs='?',
                         default=os.getcwd(),
                         help=_('The path to operate with. Defaults to current directory'),
                         metavar='PATH',
                         )
-
-
     args = parser.parse_args()
 
     action = {"create"  : create,
