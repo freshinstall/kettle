@@ -46,3 +46,17 @@ class Action():
         self.kettle.extract_kettle(path=path)
 
         self.log.debug(_("Installed %s" % self.kettle.ketid))
+
+class Create(Action):
+
+    def __init__(self):
+        # Set up some basic logging
+        self.log = logging.getLogger('kettle.Action')
+        self.log.debug(_("Logging set up!"))
+
+    def create(self, path):
+        self.log.debug(_("Starting creation of new kettle:  %s" % path))
+
+        # do some stuff
+
+        self.log.debug(_("%s created!" % path))

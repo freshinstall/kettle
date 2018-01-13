@@ -19,6 +19,8 @@
 # ket.py - Kettle object class
 
 import tarfile
+import gettext
+_ = gettext.gettext
 
 class BadKettle(Exception):
     pass
@@ -34,11 +36,14 @@ class Kettle():
 
     def __init__(self, path):
         self.path = path
-        self.kettle_ark = tarfile.open(name=self.path, mode='r')
+        try:
+            self.kettle_ark = tarfile.open(name=self.path, mode='r')
+        except FileNotFoundError:
+            raise BadKettle(_('The kettle doesn\'t exist'))
         try:
             kettle_yaml_info = self.kettle_ark.getmember('metainfo/meta.yaml')
         except KeyError:
-            raise BadKettle("The kettle is missing meta.yaml")
+            raise BadKettle(_("The kettle is missing meta.yaml"))
         kettle_yaml_b = self.kettle_ark.extractfile(kettle_yaml_info)
         for i in kettle_yaml_b.readlines():
             self.kettle_yaml.append(str(i)[2:-3])

@@ -20,14 +20,14 @@ import logging, argparse, os
 import  gettext
 _ = gettext.gettext
 
-import action, ket
+from kettle import action, ket
 
 def create(log, path=None):
     log.info(_('Creating new kettle: %s' % path))
-    act = action.Action()
+    act = action.Create()
     act.create(path)
 
-def install(log, path=None):
+def extract(log, path=None):
     try:
         kettle = ket.Kettle(path)
     except Exception as e:
@@ -39,7 +39,7 @@ def install(log, path=None):
 
 def gui(log, path=None):
     log.info(_('Running the GUI'))
-    log.warning(_('The GUI is not yet implemented, falling back to CLI.'))
+    log.exception(_('The GUI is not yet implemented, Please use the CLI instead.'))
 
 def main():
 
@@ -77,7 +77,7 @@ def main():
     args = parser.parse_args()
 
     action = {"create"  : create,
-              "install" : install,
+              "extract" : extract,
               "gui"     : gui,
     }
     if args.action:
