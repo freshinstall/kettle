@@ -29,7 +29,9 @@ Freshinstall uses a standard file using the file extension `.ket`. Despite this,
     /removed_pkg.list
 /scripts
   /extra_scripts_to_run.sh
+  /root/
+    /extra_scripts_to_run_as_root.sh
 /metainfo
-  /meta.json
+  /meta.yaml
 ```
 `.ket` files can contain extra packages that need to be installed, third-party repositories that need to be enabled, configuration files to set up custom options, source packages to include for manual installation, and scripts to run to perform other actions.

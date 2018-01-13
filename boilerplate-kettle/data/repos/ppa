@@ -1,0 +1,7 @@
+#kettle/stable
+
+## Uncommented lines will be added as PPAs. In the example, this will be:
+## ppa:kettle/stable
+## This requires the ppa module and the add-repo permission
+
+## It is safe to delete this file
