@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from disutils.core import setup
+from distutils.core import setup
 
 setup(
     name = 'kettle',
@@ -8,7 +8,7 @@ setup(
     author = 'kettle',
     description = 'Kettle is a desktop configuration manager',
     url = 'https://github.com/freshinstall/freshinstall',
-    license = 'ISC-based'
+    license = 'ISC-based',
     scripts = ['kettle/kettle'],
     packages = ['kettle'],
 )
