@@ -33,7 +33,7 @@ def extract(log, path=None, extract_dir=None):
     except Exception as e:
         log.exception(e)
         exit()
-    log.info(_('Installing kettle %s from %s' % (kettle.get_id(), path)))
+    log.info(_('Extracting kettle %s from %s' % (kettle.get_id(), path)))
     act = action.Action(kettle)
     act.extract(path=extract_dir)
 
