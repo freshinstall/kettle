@@ -20,6 +20,8 @@
 
 import tarfile
 import yaml
+import logging
+
 import gettext
 _ = gettext.gettext
 
@@ -30,29 +32,28 @@ class Kettle():
     name = ""
     ketid = ""
     modules = []
-    permissions = []
+    permissions = {}
     standard = 0
     tmppath = "/tmp/kettle/"
     kettle_yaml = []
 
     def __init__(self, path):
         self.path = path
+
         try:
             self.kettle_ark = tarfile.open(name=self.path, mode='r')
         except FileNotFoundError:
             raise BadKettle(_('The kettle doesn\'t exist'))
 
         self.get_yaml()
+        self.get_name()
         self.get_id()
+        self.get_modules()
+        self.get_permissions()
 
         self.tmppath = "/tmp/kettle/%s" % self.ketid
 
-    def get_id(self):
-        self.ketid = self.kettle_yaml['id']
-        return self.ketid
-
     def get_yaml(self):
-
         try:
             kettle_yaml_info = self.kettle_ark.getmember('metainfo/meta.yaml')
         except KeyError:
@@ -63,10 +64,21 @@ class Kettle():
 
         return self.kettle_yaml
 
+    def get_name(self):
+        self.name = self.kettle_yaml['name']
+        return self.name
+
+    def get_id(self):
+        self.ketid = self.kettle_yaml['id']
+        return self.ketid
+
     def get_modules(self):
-        self.log.debug(_('this is only here for imports'))
         self.modules = self.kettle_yaml['modules']
         return self.modules
+
+    def get_permissions(self):
+        self.permissions = self.kettle_yaml['permissions']
+        return self.permissions
 
     def extract_kettle(self, path=tmppath):
         self.kettle_ark.extractall(path=path)

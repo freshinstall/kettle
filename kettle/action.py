@@ -54,7 +54,10 @@ class Action():
         self.log.debug(_('Starting installation of %s, debug mode is %s' % (self.kettle.ketid, debug)))
         
         # do some stuff
-        self.kettle
+        modules = self.kettle.modules
+        from kettle.modules.packages import Packages
+        pkgs = Packages(kettle)
+        pkgs.get_to_root()
         self.log.debug(_('Installed %s' % self.kettle.ketid))
 
 class Create(Action):

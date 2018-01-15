@@ -37,6 +37,17 @@ def extract(log, path=None, extract_dir=None):
     act = action.Action(kettle)
     act.extract(path=extract_dir)
 
+def install(log, path=None, extract_dir=None):
+    try:
+        kettle = ket.Kettle(path)
+    except Exception as e:
+        log.exception(e)
+        exit()
+    log.info(_('installing kettle %s from %s' % (kettle.ketid, path)))
+    act = action.Action(kettle)
+    act.install(kettle)
+
+
 def gui(log, path=None):
     log.info(_('Running the GUI'))
     log.exception(_('The GUI is not yet implemented, Please use the CLI instead.'))
@@ -81,6 +92,7 @@ def main():
     action = {"create"  : create,
               "extract" : extract,
               "gui"     : gui,
+              "install" : install,
     }
     if args.action:
         log.info(_('Got command: %s' % args.action))

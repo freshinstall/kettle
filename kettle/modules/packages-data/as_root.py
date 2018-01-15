@@ -16,15 +16,22 @@
 # TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
 # OF THIS SOFTWARE.
 #
-# module.py - A base class for kettle modules
+# as_root.py - Things to do as root for a module
 
+import sys
 
-import gettext
-_ = gettext.gettext
+from kettle.ket import Kettle
+from kettle.modules.packages import Packages
 
-class Module():
-
-    def __init__(self, kettle):
-        
-        self.kettle = kettle
-        self.kettle_ark = self.kettle.kettle_ark
+kettle = Kettle(sys.argv[1])
+pkgs = Packages(kettle)
+pkgs.get_pkgs()
+print(pkgs.package_install)
+print(pkgs.package_remove)
+pkgs.cache_lock()
+for i in pkgs.package_install:
+    pkgs.mark_pkg_install(i)
+for i in pkgs.package_remove:
+    pkgs.mark_pkg_remove(i)
+pkgs.install_pkgs()
+pkgs.cache_unlock()
