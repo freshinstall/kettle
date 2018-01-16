@@ -73,26 +73,28 @@ class Packages(module.Module):
         self.cache.close()
 
     def mark_pkg_install(self, package):
-        pkg = self.cache[package]
-        if pkg.is_installed:
-            self.log.info(_('Skipping installing %s: already installed' % package))
-        else:
-            try:
+        try:
+            pkg = self.cache[package]
+            if pkg.is_installed:
+                self.log.info(_('Skipping installing %s: already installed' % package))
+            else:
                 pkg.mark_install()
                 self.log.info(_('Marking %s for installation' % package))
-            except KeyError:
-                self.log.info(_("Couldn\'t find a package called %s: skipping" % package))
+        except KeyError:
+            self.log.info(_("Couldn\'t find a package called %s: skipping" % package))
+
 
     def mark_pkg_remove(self, package):
-        pkg = self.cache[package]
-        if not pkg.is_installed:
-            self.log.info(_('Skipping removing %s: already not-installed' % package))
-        else:
-            try:
+        try:
+            pkg = self.cache[package]
+            if not pkg.is_installed:
+                self.log.info(_('Skipping removing %s: already not-installed' % package))
+            else:
                 pkg.mark_delete()
                 self.log.info(_('Marking %s for removal' % package))
-            except KeyError:
-                self.log.info(_("Couldn\'t find a package called %s: skipping" % package))
+        except KeyError:
+            self.log.info(_("Couldn\'t find a package called %s: skipping" % package))
+
 
     def install_pkgs(self):
         try:

@@ -61,10 +61,10 @@ class Action():
         self.log.debug(_('Installed %s' % self.kettle.ketid))
     
     def create(self, path):
-        self.log.debug(_("Starting creation of new kettle:  %s" % path))
+        self.log.debug(_("Starting creation of new kettle:  %s" % self.kettle.ketid))
 
         # do some stuff
         self.kettle.create()
         self.kettle.close()
 
-        self.log.debug(_("%s created!" % path))
+        self.log.debug(_("%s created!" % self.kettle.ketid))
