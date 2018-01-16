@@ -22,9 +22,15 @@ _ = gettext.gettext
 
 from kettle import action, ket
 
-def create(log, path=None):
+def create(log, path=None, extract_dir=None):
     log.info(_('Creating new kettle: %s' % path))
-    act = action.Create()
+    try:
+        kettle = ket.NewKettle(path)
+    except Exception as e:
+        log.exception(e)
+        exit()
+
+    act = action.Action(kettle)
     act.create(path)
 
 def extract(log, path=None, extract_dir=None):

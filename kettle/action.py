@@ -59,17 +59,12 @@ class Action():
         pkgs = Packages(kettle)
         pkgs.get_to_root()
         self.log.debug(_('Installed %s' % self.kettle.ketid))
-
-class Create(Action):
-
-    def __init__(self):
-        # Set up some basic logging
-        self.log = logging.getLogger('kettle.Action')
-        self.log.debug(_("Logging set up!"))
-
+    
     def create(self, path):
         self.log.debug(_("Starting creation of new kettle:  %s" % path))
 
         # do some stuff
+        self.kettle.create()
+        self.kettle.close()
 
         self.log.debug(_("%s created!" % path))

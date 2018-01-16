@@ -20,6 +20,7 @@
 
 import tarfile
 import yaml
+import glob, os
 import logging
 
 import gettext
@@ -83,3 +84,36 @@ class Kettle():
     def extract_kettle(self, path=tmppath):
         self.kettle_ark.extractall(path=path)
 
+class NewKettle(Kettle):
+
+    name = ""
+    ketid = ""
+    modules = []
+    permissions = {}
+    standard = 0
+    tmppath = "/tmp/kettle/"
+    kettle_yaml = []
+
+    def __init__(self, path):
+        self.log = logging.getLogger('kettle.NewKettle')
+        self.log.debug(_("Logging set up!"))
+        self.path = path
+        with open(os.path.join(self.path, "metainfo/meta.yaml")) as f:
+            self.kettle_yaml = yaml.safe_load(f)
+
+        self.ketid = self.kettle_yaml['id']
+        kettle_filename = ("%s.ket" % self.ketid)
+
+        try:
+            self.kettle_ark = tarfile.open(name=kettle_filename, mode='x')
+        except FileExistsError:
+            raise BadKettle(_('That kettle already exists!'))
+
+    def create(self):
+        self.log.info(_("Adding %s to kettle" % self.path))
+        os.chdir(self.path)
+        self.kettle_ark.add("data")
+        self.kettle_ark.add("metainfo")
+
+    def close(self):
+        self.kettle_ark.close()
