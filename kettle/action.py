@@ -63,24 +63,24 @@ class Action():
     def install(self, kettle, debug=False):
         self.log.debug(_('Starting installation of %s, debug mode is %s' % (self.kettle.ketid, debug)))
         
-        modules = self.kettle.modules
-        # Module introspection
-        for i in modules:
+        plugins = self.kettle.plugins
+        # Plugin introspection
+        for i in plugins:
             if not i in self.trusted_plugins:
                 allow_response = input(_(
                                         "\n\nThe kettle uses the %s plugin which is not a trusted plugin. \n" % i +
-                                        "Do you want to allow loading this module, or skip it? (yes/Skip): "))
+                                        "Do you want to allow loading this plugin, or skip it? (yes/Skip): "))
                 if not allow_response.lower() in ('y', 'yes', 'allow', 'load'):
                     continue
             try:
-                current_module = importlib.import_module('kettle.modules.' + i)
-                current_class = getattr(current_module, i.capitalize())
+                current_plugin = importlib.import_module('kettle.plugins.' + i)
+                current_class = getattr(current_plugin, i.capitalize())
                 current_object = current_class(kettle)
-                self.log.info(_("Loaded module: %s" % i))
+                self.log.info(_("Loaded plugin: %s" % i))
                 current_object.run_install()
-                self.log.info(_("Module %s complete!" % i))
+                self.log.info(_("plugin %s complete!" % i))
             except ModuleNotFoundError:
-                self.log.error(_("Couldn't find module: %s" % i))
+                self.log.error(_("Couldn't find plugin: %s" % i))
                 pass
         self.log.debug(_('Installed %s' % self.kettle.ketid))
     

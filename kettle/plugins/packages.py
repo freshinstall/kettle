@@ -41,7 +41,6 @@ class Packages(plugin.Plugin):
     cache = apt.cache.Cache()
     package_install = []
     package_remove = []
-    module_path = os.path.dirname(os.path.realpath(__file__))
 
     def __init__(self, kettle):
         super().__init__(kettle)
@@ -109,7 +108,7 @@ class Packages(plugin.Plugin):
     def get_to_root(self):
         subprocess.call(["/usr/bin/sudo",
                          "/usr/bin/python3",
-                         self.module_path + "/packages-data/as_root.py",
+                         self.plugin_path + "/packages-data/as_root.py",
                          self.kettle.path])
     def run_install(self):
         #code goes here

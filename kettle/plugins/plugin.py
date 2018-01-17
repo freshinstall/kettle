@@ -16,7 +16,7 @@
 # OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 # PERFORMANCE OF THIS SOFTWARE.
 #
-# module.py - A base class for kettle modules
+# plugin.py - A base class for kettle plugins
 
 
 import gettext
@@ -24,6 +24,7 @@ _ = gettext.gettext
 
 class Plugin():
 
+    plugin_path = os.path.dirname(os.path.realpath(__file__))
     permissions = {'script': True,
                    'root': True,
                    'remove-pkg': True,

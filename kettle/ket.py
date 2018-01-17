@@ -32,7 +32,7 @@ class BadKettle(Exception):
 class Kettle():
     name = ""
     ketid = ""
-    modules = []
+    plugins = []
     permissions = {}
     standard = 0
     tmppath = "/tmp/kettle/"
@@ -49,7 +49,7 @@ class Kettle():
         self.get_yaml()
         self.get_name()
         self.get_id()
-        self.get_modules()
+        self.get_plugins()
         self.get_permissions()
 
         self.tmppath = "/tmp/kettle/%s" % self.ketid
@@ -73,9 +73,9 @@ class Kettle():
         self.ketid = self.kettle_yaml['id']
         return self.ketid
 
-    def get_modules(self):
-        self.modules = self.kettle_yaml['modules']
-        return self.modules
+    def get_plugins(self):
+        self.plugins = self.kettle_yaml['plugins']
+        return self.plugins
 
     def get_permissions(self):
         self.permissions = self.kettle_yaml['permissions']

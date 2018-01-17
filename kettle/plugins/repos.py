@@ -31,15 +31,19 @@ class BadKettle(Exception):
 
 class Repos(plugin.Plugin):
 
+    permissions = {'script': False,
+                   'root': True,
+                   'remove-pkg': False,
+                   'system-config': True
+                   }
     sp = SoftwareProperties()
     ppas_list = []
-    module_path = os.path.dirname(os.path.realpath(__file__))
 
     def get_ppas(self):
         try:
             ppas_member = self.kettle_ark.getmember('data/repos/ppas.repos')
         except KeyError:
-            raise BadKettle(_("The kettle is missing data for module: repos"))
+            raise BadKettle(_("The kettle is missing data for plugin: repos"))
 
         ppas_exfile = self.kettle_ark.extractfile(ppas_member)
         ppas_bytes = ppas_exfile.readlines()
@@ -64,7 +68,7 @@ class Repos(plugin.Plugin):
     def get_to_root(self):
         subprocess.call(["/usr/bin/sudo",
                          "/usr/bin/python3",
-                         self.module_path + "/repos-data/as_root.py",
+                         self.plugin_path + "/repos-data/as_root.py",
                          self.kettle.path])
 
     def run_install(self):

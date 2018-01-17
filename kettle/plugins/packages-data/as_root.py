@@ -21,7 +21,7 @@
 import sys
 
 from kettle.ket import Kettle
-from kettle.modules.packages import Packages
+from kettle.plugins.packages import Packages
 
 kettle = Kettle(sys.argv[1])
 pkgs = Packages(kettle)
