@@ -16,45 +16,77 @@
 # TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
 # OF THIS SOFTWARE.
 
-import logging, argparse, os
-import  gettext
-_ = gettext.gettext
+import logging, argparse, os # These are extra modules that extend the functionality of the language
+import  gettext # This module is explicitly for translations
+_ = gettext.gettext # This is required for setting up the translations
 
-from kettle import action, ket
+from kettle import action, ket # From the kettle package (this folder), import the action and ket modules (action.py, ket.py)
 
+# Below here is where we actually run things:
+
+# This is a function. It does something.
+# This one is run when the user wants to create a kettle.
 def create(log, path=None, extract_dir=None):
-    log.info(_('Creating new kettle: %s' % path))
-    try:
-        kettle = ket.NewKettle(path)
-    except Exception as e:
-        log.exception(e)
-        exit()
+    # Create a kettle from a path. Arguments:
+    # log         : The logging module for text output
+    # path        : The path to the folder to create the Kettle from.
+    # extract_dir : This argument isn't used for this function, but is specified in case we get it from our caller.
 
-    act = action.Action(kettle)
-    act.create(path)
+    log.info(_('Creating new kettle: %s' % path)) # Use log.info and log.debug to print output to the command line.
+
+    # try/except are used when we expect an action might fail to catch that failure and inform the user what went wrong.
+    try:                               # First, you put the code you think might fail after the "try" statement
+        kettle = ket.NewKettle(path)   # In this case, we're trying to create a new kettle object using the NewKettle.
+    except Exception as e:             # If we fail, we need to catch that error (exception)
+        log.exception(e)               # Tell the user what happened
+        exit()                         # Quit back to the command line, so the user can try again
+
+    # If we can create the NewKettle object, we should be good.
+    act = action.Action(kettle)   # Now we create a new action object called act, which gets the kettle we created as an argument
+    act.create(path)              # And we run the create function of that action, which actually takes care of making the new kettle.
+
 
 def extract(log, path=None, extract_dir=None):
+    # Extract an existing kettle to a directory. Arguments:
+    # log         : The logging module for text output
+    # path        : The path to the kettle file to extract.
+    # extract_dir : The name of the directory to extract the kettle to.
+
+    # Another try/except block. We do these in case the user points us to a kettle that doesn't exist
     try:
-        kettle = ket.Kettle(path)
+        kettle = ket.Kettle(path) # This time we're using the normal Kettle class, since it exists already.
     except Exception as e:
         log.exception(e)
         exit()
+
+    # Next we extract the kettle. First we use the log to tell the user:
     log.info(_('Extracting kettle %s from %s' % (kettle.get_id(), path)))
-    act = action.Action(kettle)
-    act.extract(path=extract_dir)
+    act = action.Action(kettle)             # Then we create another new Action class object
+    act.extract(path=extract_dir)           # And we use the extract function of the Action class
+
 
 def install(log, path=None, extract_dir=None):
+    # Install a kettle into the system. Arguments:
+    # Extract an existing kettle to a directory. Arguments:
+    # log         : The logging module for text output
+    # path        : The path to the kettle file to extract.
+    # extract_dir : Unused in this function
+
+    # See how any time we do something that could result in an exception, we put is in this block?
     try:
         kettle = ket.Kettle(path)
     except Exception as e:
         log.exception(e)
         exit()
+
+    # Basically the same structure as the extraction function, but using the install function
     log.info(_('installing kettle %s from %s' % (kettle.ketid, path)))
     act = action.Action(kettle)
     act.install(kettle)
 
 
 def gui(log, path=None):
+    # This function isn't used yet.
     log.info(_('Running the GUI'))
     log.exception(_('The GUI is not yet implemented, Please use the CLI instead.'))
 
