@@ -1,6 +1,6 @@
 --- # Sample Kettle metadata
 name: Boilerplate Kettle
-id: boilerplate-kettle
+id: boilerplate
 description: >
              This is a sample (boilerplate) kettle that installs kettle. If you
              can install this, it is useless, but it serves as a good template 
