@@ -18,7 +18,7 @@
 #
 # repos.py - Repository module for Kettle
 
-import shutil
+import shutil, subprocess, os
 from softwareproperties.SoftwareProperties import SoftwareProperties
 
 from . import module
@@ -32,7 +32,8 @@ class BadKettle(Exception):
 class Repos(module.Module):
 
     sp = SoftwareProperties()
-    self.ppas_list = []
+    ppas_list = []
+    module_path = os.path.dirname(os.path.realpath(__file__))
 
     def get_ppas(self):
         try:
@@ -59,4 +60,13 @@ class Repos(module.Module):
                 self.sp.reload_sourceslist()
             except:
                 raise BadRepo(_("Couldn't add the repository %s" % i))
+
+    def get_to_root(self):
+        subprocess.call(["/usr/bin/sudo",
+                         "/usr/bin/python3",
+                         self.module_path + "/repos-data/as_root.py",
+                         self.kettle.path])
+
+    def run(self):
+        self.get_to_root()
         
