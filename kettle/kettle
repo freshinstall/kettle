@@ -18,15 +18,15 @@
 #
 # kettle - main program
 
-import logging, argparse, os # These are extra modules that extend the functionality of the language
-import  gettext # This module is explicitly for translations
-_ = gettext.gettext # This is required for setting up the translations
+import logging, argparse, os   # These are extra modules that extend the functionality of the language
+import  gettext                # This module is explicitly for translations
+_ = gettext.gettext            # This is required for setting up the translations
 
 from kettle import action, ket # From the kettle package (this folder), import the action and ket modules (action.py, ket.py)
 
 # Below here is where we actually run things:
 
-# This is a function. It does something.
+# This is a function. It does something. It's analagous to a function.
 # This one is run when the user wants to create a kettle.
 def create(log, path=None, extract_dir=None):
     # Create a kettle from a path. Arguments:
@@ -64,7 +64,7 @@ def extract(log, path=None, extract_dir=None):
     # Next we extract the kettle. First we use the log to tell the user:
     log.info(_('Extracting kettle %s from %s' % (kettle.get_id(), path)))
     act = action.Action(kettle)             # Then we create another new Action class object
-    act.extract(path=extract_dir)           # And we use the extract function of the Action class
+    act.extract(path=extract_dir)           # And we use the extract method of the Action class
 
 
 def install(log, path=None, extract_dir=None):
@@ -90,25 +90,31 @@ def install(log, path=None, extract_dir=None):
 def gui(log, path=None):
     # This function isn't used yet.
     log.info(_('Running the GUI'))
-    log.exception(_('The GUI is not yet implemented, Please use the CLI instead.'))
+    log.exception(_('The GUI is not yet implemented, Please use the CLI instead.')) #Quit with an error that tells the user what to do.
 
 def main():
+    # main() is the primary function of the program. If you run the program from
+    # the command line (or the python interpreter), this is what will run.
 
-    # Set up some basic logging
+    # Set up some basic logging. This creates the logging object that we'll use throughout the program.
     log = logging.getLogger('kettle')
     handler = logging.StreamHandler()
     formatter = logging.Formatter('%(asctime)s %(name)-14s %(levelname)-8s %(message)s')
     handler.setFormatter(formatter)
     log.addHandler(handler)
     log.setLevel(logging.DEBUG)
-    directory=None
-
     log.debug(_("Logging set up!"))
 
+    directory=None
+
     # Argument processing
+    # parser is the argument interpreter for the program. We create it as a new
+    # ArgumentParser class with some information to give the user some helpful
+    # advice if they run kettle without any arguments or with --help.
     parser = argparse.ArgumentParser(prog="kettle",
                                      description=_('Desktop configuration manager'),
                                      )
+    # Here we add the arguments that kettle uses.
     parser.add_argument('action',
                         nargs='?',
                         default='gui',
@@ -127,20 +133,35 @@ def main():
                         help=_('The directory to extract the kettle to or create it from.'),
                         dest=directory,
                         )
+    # Next we tell the parser to parse the arguments into an args object which
+    # we can use to get the values that the user specified.
     args = parser.parse_args()
 
+    # We set up a dictionary to relate the action that the user specified on the
+    # command line. A dictionary is a special kind of thing that allows you to
+    # look up a value (the "key") and get a value back.
     action = {"create"  : create,
               "extract" : extract,
               "gui"     : gui,
               "install" : install,
     }
-    if args.action:
-        log.info(_('Got command: %s' % args.action))
+
+    if args.action: # If the user passed an action argument to the program
+        log.info(_('Got command: %s' % args.action))    # Some helpful logging
         log.debug('Destination is %s' % args.directory)
+
+        # If the user specified a directory to use, we need to pass it.
+        # Otherwise, we need to pass nothing at all.
         if args.directory == None:
+            # action[args.action] looks up the value of the key named for what
+            # the user gave as ACTION on the command line. It allows us to call
+            # the function without having to use a lot of if/else statements.
             action[args.action](log, path=args.file)
         else:
             action[args.action](log, path=args.file, extract_dir=args.directory)
 
+# This tells python that if the program was run by itself, we need to run the
+# main() function. This allows us to run the program as a CLI application while
+# also letting us import kettle from other programs.
 if __name__ == "__main__":
     main()
