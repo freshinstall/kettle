@@ -84,6 +84,29 @@ class Action():
                 pass
         self.log.debug(_('Installed %s' % self.kettle.ketid))
     
+    def info(self):
+        kettle_info = []
+        kettle_info.append(_('Kettle Information:'))
+        kettle_info.append(_('  ID: %s' % self.kettle.ketid))
+        kettle_info.append(_('  Name: %s' % self.kettle.name))
+        kettle_info.append(_('  Author: %s <%s>' % (self.kettle.get_info('author'),
+                                                 self.kettle.get_info('email'))))
+        kettle_info.append(_('  URL: %s' % self.kettle.get_info('URL')))
+        kettle_info.append(_('  Version: %s' % self.kettle.get_info('version')))
+        kettle_info.append(_('Plugins:'))
+        for i in self.kettle.plugins:
+            plugin_trusted = _("Untrusted")
+            if i in self.trusted_plugins:
+                plugin_trusted = _("Trusted")
+            plugin_info = '        %s, %s' % (i, plugin_trusted)
+            kettle_info.append(plugin_info)
+        kettle_info.append(_('Permissions Requested:'))
+        for i in self.kettle.permissions:
+            if self.kettle.permissions[i] == True:
+                permission = '        %s' % i
+                kettle_info.append(permission)
+        return kettle_info
+
     def create(self, path):
         self.log.debug(_("Starting creation of new kettle:  %s" % self.kettle.ketid))
 

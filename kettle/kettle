@@ -34,6 +34,9 @@ def create(log, path=None, extract_dir=None):
 
     act = action.Action(kettle)
     act.create(path)
+    kettle_info = act.info()
+    for i in kettle_info:
+        print(i)
 
 def extract(log, path=None, extract_dir=None):
     try:
@@ -55,6 +58,17 @@ def install(log, path=None, extract_dir=None):
     act = action.Action(kettle)
     act.install(kettle)
 
+def info(log, path=None, extract_dir=None):
+    try:
+        kettle = ket.Kettle(path)
+    except Exception as e:
+        log.exception(e)
+        exit()
+
+    act = action.Action(kettle)
+    kettle_info = act.info()
+    for i in kettle_info:
+        print(i)
 
 def gui(log, path=None):
     log.info(_('Running the GUI'))
@@ -101,6 +115,7 @@ def main():
               "extract" : extract,
               "gui"     : gui,
               "install" : install,
+              "info"    : info,
     }
     if args.action:
         log.info(_('Got command: %s' % args.action))

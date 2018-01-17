@@ -81,33 +81,33 @@ class Kettle():
         self.permissions = self.kettle_yaml['permissions']
         return self.permissions
 
+    def get_info(self, key):
+        return self.kettle_yaml[key]
+
     def extract_kettle(self, path=tmppath):
         self.kettle_ark.extractall(path=path)
 
 class NewKettle(Kettle):
 
-    name = ""
-    ketid = ""
-    modules = []
-    permissions = {}
-    standard = 0
-    tmppath = "/tmp/kettle/"
-    kettle_yaml = []
-
     def __init__(self, path):
         self.log = logging.getLogger('kettle.NewKettle')
         self.log.debug(_("Logging set up!"))
         self.path = path
-        with open(os.path.join(self.path, "metainfo/meta.yaml")) as f:
-            self.kettle_yaml = yaml.safe_load(f)
-
-        self.ketid = self.kettle_yaml['id']
+        self.get_yaml()
+        self.get_name()
+        self.get_id()
+        self.get_plugins()
+        self.get_permissions()
         kettle_filename = ("%s.ket" % self.ketid)
 
         try:
             self.kettle_ark = tarfile.open(name=kettle_filename, mode='x')
         except FileExistsError:
             raise BadKettle(_('That kettle already exists!'))
+
+    def get_yaml(self):
+        with open(os.path.join(self.path, "metainfo/meta.yaml")) as f:
+            self.kettle_yaml = yaml.safe_load(f)
 
     def create(self):
         self.log.info(_("Adding %s to kettle" % self.path))
