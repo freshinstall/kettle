@@ -108,6 +108,6 @@ class Packages(module.Module):
                          "/usr/bin/python3", 
                          self.module_path + "/packages-data/as_root.py",
                          self.kettle.path])
-    def run(self):
+    def run_install(self):
         #code goes here
         self.get_to_root()

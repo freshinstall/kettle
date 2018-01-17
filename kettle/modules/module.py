@@ -28,3 +28,9 @@ class Module():
         
         self.kettle = kettle
         self.kettle_ark = self.kettle.kettle_ark
+
+    def run_install(self):
+        self.kettle
+
+    def run_remove(self):
+        self.kettle

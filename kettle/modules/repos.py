@@ -67,6 +67,6 @@ class Repos(module.Module):
                          self.module_path + "/repos-data/as_root.py",
                          self.kettle.path])
 
-    def run(self):
+    def run_install(self):
         self.get_to_root()
         

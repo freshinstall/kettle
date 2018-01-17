@@ -8,9 +8,9 @@
 # purpose with or without fee is hereby granted, provided that the above
 # copyright notice and this permission notice appear in all copies.
 #
-# THE SOFTWARE IS PROVIDED “AS IS” AND ISC DISCLAIMS ALL WARRANTIES WITH REGARD 
+# THE SOFTWARE IS PROVIDED “AS IS” AND KETTLE DISCLAIMS ALL WARRANTIES WITH REGARD
 # TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
-# FITNESS. IN NO EVENT SHALL ISC BE LIABLE FOR  ANY SPECIAL, DIRECT, INDIRECT,
+# FITNESS. IN NO EVENT SHALL KETTLE BE LIABLE FOR  ANY SPECIAL, DIRECT, INDIRECT,
 # OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
 # DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
 # TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
@@ -24,6 +24,16 @@ _ = gettext.gettext
 
 # generic action class
 class Action():
+
+    trusted_plugins = ['packages']
+    untrusted_response = {"Y" : True,
+                          "y" : True,
+                          "yes" : True,
+                          "Yes" : True,
+                          "true" : True,
+                          "True" : True,
+                          }
+
 
     def __init__(self, kettle):
         # Set up some basic logging
@@ -53,15 +63,21 @@ class Action():
     def install(self, kettle, debug=False):
         self.log.debug(_('Starting installation of %s, debug mode is %s' % (self.kettle.ketid, debug)))
         
-        # do some stuff
         modules = self.kettle.modules
+        # Module introspection
         for i in modules:
+            if not i in self.trusted_plugins:
+                allow_response = input(_(
+                                        "\n\nThe kettle uses the %s plugin which is not a trusted plugin. \n" % i +
+                                        "Do you want to allow loading this module, or skip it? (yes/Skip): "))
+                if not allow_response.lower() in ('y', 'yes', 'allow', 'load'):
+                    continue
             try:
                 current_module = importlib.import_module('kettle.modules.' + i)
                 current_class = getattr(current_module, i.capitalize())
                 current_object = current_class(kettle)
                 self.log.info(_("Loaded module: %s" % i))
-                current_object.run()
+                current_object.run_install()
                 self.log.info(_("Module %s complete!" % i))
             except ModuleNotFoundError:
                 self.log.error(_("Couldn't find module: %s" % i))
