@@ -26,6 +26,6 @@ setup(
     url = 'https://github.com/freshinstall/freshinstall',
     license = 'ISC-based',
     scripts = ['kettle/kettle'],
-    packages = ['kettle', 'kettle.modules'],
-    package_data={'kettle.modules': ["**/*.py"]}
+    packages = ['kettle', 'kettle.plugins'],
+    package_data={'kettle.plugis': ["**/*.py"]}
 )

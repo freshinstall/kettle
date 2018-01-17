@@ -23,7 +23,7 @@ import sys, os
 import subprocess
 import logging
 
-from . import module
+from . import plugin
 
 import gettext
 _ = gettext.gettext
@@ -31,40 +31,43 @@ _ = gettext.gettext
 class BadKettle(Exception):
     pass
 
-class Packages(module.Module):
+class Packages(plugin.Plugin):
 
+    permissions = {'script': False,
+                   'root': True,
+                   'remove-pkg': True,
+                   'system-config': True
+                   }
     cache = apt.cache.Cache()
     package_install = []
     package_remove = []
     module_path = os.path.dirname(os.path.realpath(__file__))
-    
-    def get_pkgs(self):
+
+    def __init__(self, kettle):
+        super().__init__(kettle)
         self.log = logging.getLogger('kettle.modules.Packages')
         self.log.debug(_("Logging set up!"))
-        
+        self.permissions = self.kettle.permissions
+
         try:
             package_install_info = self.kettle_ark.getmember('data/packages/install.deblist')
             package_remove_info = self.kettle_ark.getmember('data/packages/remove.deblist')
         except KeyError:
             raise BadKettle(_('The kettle is missing data for module: Packages'))
-        
+
         package_install_b = self.kettle_ark.extractfile(package_install_info)
         package_remove_b = self.kettle_ark.extractfile(package_remove_info)
-        self.install_allowed = self.kettle.permissions['install-apt']
-        self.remove_allowed = self.kettle.permissions['remove-pkg']
-        
-        if self.install_allowed:
-            for i in package_install_b:
-                if not str(i).startswith("b'#"):
-                    self.package_install.append(str(i)[2:-3])
-                
+        self.remove_allowed = self.permissions['remove-pkg']
+
+        for i in package_install_b:
+            if not str(i).startswith("b'#"):
+                self.package_install.append(str(i)[2:-3])
+
         if self.remove_allowed:
             for i in package_remove_b:
                 if not str(i).startswith("b'#"):
                     self.package_remove.append(str(i)[2:-3])
-            
-        
-        
+
     def cache_lock(self):
         self.cache.update()
         self.cache.open()
@@ -102,10 +105,10 @@ class Packages(module.Module):
         except:
             self.log.exception(_("Package installation failed."))
             self.cache_unlock()
-    
+
     def get_to_root(self):
-        subprocess.call(["/usr/bin/sudo", 
-                         "/usr/bin/python3", 
+        subprocess.call(["/usr/bin/sudo",
+                         "/usr/bin/python3",
                          self.module_path + "/packages-data/as_root.py",
                          self.kettle.path])
     def run_install(self):

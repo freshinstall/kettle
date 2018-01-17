@@ -22,15 +22,24 @@
 import gettext
 _ = gettext.gettext
 
-class Module():
+class Plugin():
+
+    permissions = {'script': True,
+                   'root': True,
+                   'remove-pkg': True,
+                   'system-config': True
+                   }
 
     def __init__(self, kettle):
-        
+
         self.kettle = kettle
         self.kettle_ark = self.kettle.kettle_ark
 
+    def list_permissions(self):
+        return self.permissions
+
     def run_install(self):
-        self.kettle
+        raise NotImplementedError
 
     def run_remove(self):
-        self.kettle
+        raise NotImplementedError

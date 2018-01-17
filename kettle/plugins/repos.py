@@ -21,7 +21,7 @@
 import shutil, subprocess, os
 from softwareproperties.SoftwareProperties import SoftwareProperties
 
-from . import module
+from . import plugin
 
 import gettext
 _ = gettext.gettext
@@ -29,7 +29,7 @@ _ = gettext.gettext
 class BadKettle(Exception):
     pass
 
-class Repos(module.Module):
+class Repos(plugin.Plugin):
 
     sp = SoftwareProperties()
     ppas_list = []
