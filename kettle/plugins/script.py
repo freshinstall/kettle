@@ -53,6 +53,15 @@ class Script(plugin.Plugin):
         self.root_script_path = os.path.join(self.script_dir, "root.sh")
         self.has_root_script = os.path.exists(self.root_script_path)
 
+    def sanitize_script(self, script_path):
+        with open(script_path, 'r') as in_file:
+            in_lines = in_file.readlines()
+        with open(script_path, 'r+') as out_file:
+            for line in in_lines:
+                if "sudo" not in line:
+                    out_file.write(line)
+            out_file.truncate()
+
     def extract_scripts(self):
         self.kettle.extract_kettle(path=self.kettle.tmppath)
 
@@ -62,9 +71,17 @@ class Script(plugin.Plugin):
         else:
             subprocess.call(["/usr/bin/sudo",
                             script_path])
+
+    def clear_sudo(self):
+        subprocess.call(["/usr/bin/sudo", "-k"])
+
     def run_install(self):
+        self.log.info(_("Clearing and existing sudo permissions"))
+        self.clear_sudo()
         script_path_normal = os.path.join(self.script_dir, "script.sh")
-        self.log.info(_('Loading script: %s' % script_path_normal))
+        self.log.info(_('Sanitizing script %s' % script_path_normal))
+        self.sanitize_script(script_path_normal)
+        self.log.info(_('Loading sanitized script: %s' % script_path_normal))
         self.run_script(script_path_normal)
         if self.root_allowed == True:
             if self.has_root_script == True:
@@ -74,7 +91,7 @@ class Script(plugin.Plugin):
                         "Policy prevents running a root script without " +
                         "previewing. \nPress [enter] to preview... "))
                 print(_("\n** BEGIN SCRIPT: **\n**"))
-                with open(self.root_script_path) as f:
+                with open(self.root_script_path, 'rt') as f:
                     lines = f.readlines()
                     for line in lines:
                         print("** " +line[:-1])
