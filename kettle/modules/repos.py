@@ -19,6 +19,7 @@
 # repos.py - Repository module for Kettle
 
 import shutil
+from softwareproperties.SoftwareProperties import SoftwareProperties
 
 from . import module
 
@@ -30,9 +31,32 @@ class BadKettle(Exception):
 
 class Repos(module.Module):
 
-    def get_repos(self):
+    sp = SoftwareProperties()
+    self.ppas_list = []
+
+    def get_ppas(self):
         try:
+            ppas_member = self.kettle_ark.getmember('data/repos/ppas.repos')
+        except KeyError:
+            raise BadKettle(_("The kettle is missing data for module: repos"))
+
+        ppas_exfile = self.kettle_ark.extractfile(ppas_member)
+        ppas_bytes = ppas_exfile.readlines()
+        ppas_exfile.close()
 
 
-    def install_repos(self):
+        for i in ppas_bytes:
+            line = i.decode('UTF-8')[:-1]
+            self.ppas_list.append(line)
+        return self.ppas_list
+
+
+    def install_repos(self, repo_list):
+        for i in repo_list:
+            try:
+                self.sp.add_source_from_line(i)
+                self.sp.sourceslist.save()
+                self.sp.reload_sourceslist()
+            except:
+                raise BadRepo(_("Couldn't add the repository %s" % i))
         

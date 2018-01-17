@@ -18,7 +18,7 @@
 #
 # action.py - actions to take
 
-import logging, os
+import logging, os, importlib
 import gettext
 _ = gettext.gettext
 
@@ -55,9 +55,17 @@ class Action():
         
         # do some stuff
         modules = self.kettle.modules
-        from kettle.modules.packages import Packages
-        pkgs = Packages(kettle)
-        pkgs.get_to_root()
+        for i in modules:
+            try:
+                current_module = importlib.import_module('kettle.modules.' + i)
+                current_class = getattr(current_module, i.capitalize())
+                current_object = current_class(kettle)
+                self.log.info(_("Loaded module: %s" % i))
+                current_object.run()
+                self.log.info(_("Module %s complete!" % i))
+            except ModuleNotFoundError:
+                self.log.error(_("Couldn't find module: %s" % i))
+                pass
         self.log.debug(_('Installed %s' % self.kettle.ketid))
     
     def create(self, path):
