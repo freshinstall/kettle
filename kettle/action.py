@@ -25,7 +25,7 @@ _ = gettext.gettext
 # generic action class
 class Action():
 
-    trusted_plugins = ['packages']
+    trusted_plugins = ['packages', 'repos']
     untrusted_response = {"Y" : True,
                           "y" : True,
                           "yes" : True,
@@ -65,22 +65,22 @@ class Action():
         
         plugins = self.kettle.plugins
         # Plugin introspection
-        for i in plugins:
-            if not i in self.trusted_plugins:
+        for plugin in plugins:
+            if not plugin in self.trusted_plugins:
                 allow_response = input(_(
-                                        "\n\nThe kettle uses the %s plugin which is not a trusted plugin. \n" % i +
+                                        "\n\nThe kettle uses the %s plugin which is not a trusted plugin. \n" % plugin +
                                         "Do you want to allow loading this plugin, or skip it? (yes/Skip): "))
                 if not allow_response.lower() in ('y', 'yes', 'allow', 'load'):
                     continue
             try:
-                current_plugin = importlib.import_module('kettle.plugins.' + i)
-                current_class = getattr(current_plugin, i.capitalize())
+                current_plugin = importlib.import_module('kettle.plugins.' + plugin)
+                current_class = getattr(current_plugin, plugin.capitalize())
                 current_object = current_class(kettle)
-                self.log.info(_("Loaded plugin: %s" % i))
+                self.log.info(_("Loaded plugin: %s" % plugin))
                 current_object.run_install()
-                self.log.info(_("plugin %s complete!" % i))
+                self.log.info(_("plugin %s complete!" % plugin))
             except ModuleNotFoundError:
-                self.log.error(_("Couldn't find plugin: %s" % i))
+                self.log.error(_("Couldn't find plugin: %s" % plugin))
                 pass
         self.log.debug(_('Installed %s' % self.kettle.ketid))
     
@@ -94,11 +94,11 @@ class Action():
         kettle_info.append(_('  URL: %s' % self.kettle.get_info('URL')))
         kettle_info.append(_('  Version: %s' % self.kettle.get_info('version')))
         kettle_info.append(_('Plugins:'))
-        for i in self.kettle.plugins:
+        for plugin in self.kettle.plugins:
             plugin_trusted = _("Untrusted")
-            if i in self.trusted_plugins:
+            if plugin in self.trusted_plugins:
                 plugin_trusted = _("Trusted")
-            plugin_info = '        %s, %s' % (i, plugin_trusted)
+            plugin_info = '        %s, %s' % (plugin, plugin_trusted)
             kettle_info.append(plugin_info)
         kettle_info.append(_('Permissions Requested:'))
         for i in self.kettle.permissions:

@@ -18,7 +18,7 @@
 #
 # plugin.py - A base class for kettle plugins
 
-
+import os
 import gettext
 _ = gettext.gettext
 

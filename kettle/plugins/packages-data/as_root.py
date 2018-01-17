@@ -25,7 +25,6 @@ from kettle.plugins.packages import Packages
 
 kettle = Kettle(sys.argv[1])
 pkgs = Packages(kettle)
-pkgs.get_pkgs()
 pkgs.cache_lock()
 for i in pkgs.package_install:
     pkgs.mark_pkg_install(i)

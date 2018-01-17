@@ -27,5 +27,5 @@ setup(
     license = 'ISC-based',
     scripts = ['kettle/kettle'],
     packages = ['kettle', 'kettle.plugins'],
-    package_data={'kettle.plugis': ["**/*.py"]}
+    package_data={'kettle.plugins': ["**/*.py"]}
 )

@@ -44,7 +44,7 @@ class Packages(plugin.Plugin):
 
     def __init__(self, kettle):
         super().__init__(kettle)
-        self.log = logging.getLogger('kettle.modules.Packages')
+        self.log = logging.getLogger('kettle.Plugin.Packages')
         self.log.debug(_("Logging set up!"))
         self.permissions = self.kettle.permissions
 
