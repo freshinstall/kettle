@@ -37,7 +37,7 @@ class Script(plugin.Plugin):
                    }
     root_allowed = permissions['root']
     script_dir = ""
-    has_root_script = False
+    has_script = False
 
     def __init__(self, kettle):
         # Set up some basic logging
@@ -47,64 +47,56 @@ class Script(plugin.Plugin):
         super().__init__(kettle)
 
         self.permissions = self.kettle.permissions
-        self.root_allowed = self.permissions['root']
         self.extract_scripts()
         self.script_dir = os.path.join(self.kettle.tmppath, "data/scripts")
-        self.root_script_path = os.path.join(self.script_dir, "root.sh")
-        self.has_root_script = os.path.exists(self.root_script_path)
-
-    def sanitize_script(self, script_path):
-        with open(script_path, 'r') as in_file:
-            in_lines = in_file.readlines()
-        with open(script_path, 'r+') as out_file:
-            for line in in_lines:
-                if "sudo" not in line:
-                    out_file.write(line)
-            out_file.truncate()
+        self.script_path = os.path.join(self.script_dir, "script.sh")
+        self.has_script = os.path.exists(self.script_path)
 
     def extract_scripts(self):
         self.kettle.extract_kettle(path=self.kettle.tmppath)
 
-    def run_script(self, script_path, root=False):
+    def set_script_perms(self, script):
+        os.chmod(script, stat.S_IXUSR)
+        os.chmod(script, stat.S_IXGRP)
+
+    def run_script(self, to_run, root=False):
+        self.set_script_perms(to_run)
         if root == False:
-            subprocess.call([script_path])
+            subprocess.call(["/bin/rbash", to_run])
         else:
             subprocess.call(["/usr/bin/sudo",
-                            script_path])
+                             "/bin/rbash",
+                             to_run])
+
+    def print_warning_message(self):
+        print(_("\n\nThe Script module gives control of your system to the " +
+                "scripts provided by this \nkettle. This is potentially " +
+                "dangerous, and you should be extremely careful when \ndoing " +
+                "this. \nOnly allow running this script if you are sure that " +
+                "you trust this kettle and \nits author. For questions, " +
+                "contact the author. You can find the contact \ninformation " +
+                "by running 'kettle info kettle-name.ket'\n\nFor security, " +
+                "the script will be printed to the screen. Please review the " +
+                "script\nfor anything potentially dangerous (like 'sudo', " +
+                "'su', 'bash', 'rm', etc)."))
+
+    def print_script(self, to_print):
+        print(_("\n** BEGIN SCRIPT: **\n**"))
+        with open(to_print, "r") as in_file:
+            in_lines = in_file.readlines()
+        for line in in_lines:
+            print("** " + line[:-1])
+        print(_("**\n** END SCRIPT **\n\n"))
 
     def clear_sudo(self):
         subprocess.call(["/usr/bin/sudo", "-k"])
 
     def run_install(self):
-        self.log.info(_("Clearing and existing sudo permissions"))
+        self.log.info(_("Clearing any existing sudo permissions"))
         self.clear_sudo()
-        script_path_normal = os.path.join(self.script_dir, "script.sh")
-        self.log.info(_('Sanitizing script %s' % script_path_normal))
-        self.sanitize_script(script_path_normal)
-        self.log.info(_('Loading sanitized script: %s' % script_path_normal))
-        self.run_script(script_path_normal)
-        if self.root_allowed == True:
-            if self.has_root_script == True:
-                self.log.warn(_('Root allowed and root script found.'))
-                input(_("\n\nThis Kettle has a root script and the " +
-                        "root permission is allowed. \n" +
-                        "Policy prevents running a root script without " +
-                        "previewing. \nPress [enter] to preview... "))
-                print(_("\n** BEGIN SCRIPT: **\n**"))
-                with open(self.root_script_path, 'rt') as f:
-                    lines = f.readlines()
-                    for line in lines:
-                        print("** " +line[:-1])
-                print(_('**\n** END SCRIPT **'))
-                run_root = input(_("\nWARNING! " +
-                                   "Scripts with root can perform any actions " +
-                                   "you can perform from a\ncommand " +
-                                   "line as ROOT. This means it has FULL " +
-                                   "ACCESS to your system!\n\nDO NOT allow " +
-                                   "this action if you don't fully trust this " +
-                                   "kettle and it's author.\n\nDo you want to " +
-                                   "allow this action? (yes/No) "))
-                if run_root.lower() in ['y', 'yes', 'allow', 'load']:
-                    self.run_script(self.root_script_path, root=True)
-
-
+        self.print_warning_message()
+        input(_("Press [enter] to review the script... "))
+        self.print_script(self.script_path)
+        runit = input(_("Do you want to run this script? (yes/No): "))
+        if runit.lower() in ['y', 'yes', 'allow', 'run']:
+            self.run_script(self.script_path)
