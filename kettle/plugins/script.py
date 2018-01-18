@@ -55,12 +55,7 @@ class Script(plugin.Plugin):
     def extract_scripts(self):
         self.kettle.extract_kettle(path=self.kettle.tmppath)
 
-    def set_script_perms(self, script):
-        os.chmod(script, stat.S_IXUSR)
-        os.chmod(script, stat.S_IXGRP)
-
     def run_script(self, to_run, root=False):
-        self.set_script_perms(to_run)
         if root == False:
             subprocess.call(["/bin/rbash", to_run])
         else:
