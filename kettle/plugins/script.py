@@ -18,7 +18,7 @@
 #
 # scriptpy - Kettle plugin for running scripts
 
-import os, subprocess, logging
+import os, stat, subprocess, logging
 
 from . import plugin
 
