@@ -42,7 +42,7 @@ class Config(plugin.Plugin):
 
     def restore_home_configuration(self):
         self.log.info(_("Restoring user configuration"))
-        self.kettle.extract_kettle()
+        self.kettle.extract_kettle(path=self.kettle.tmppath)
         for item in os.listdir(self.usr_config_path):
             s = os.path.join(self.usr_config_path, item)
             d = os.path.join(self.user_home, item)
