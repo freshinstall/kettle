@@ -15,32 +15,13 @@
 # LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 # OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 # PERFORMANCE OF THIS SOFTWARE.
-#
-# plugin.py - A base class for kettle plugins
 
-import os
-import gettext
-_ = gettext.gettext
+import sys
 
-class Plugin():
+from kettle.ket import Kettle
+from kettle.plugins.config import Config
 
-    plugin_path = os.path.dirname(os.path.realpath(__file__))
-    permissions = {'script': True,
-                   'root': True,
-                   'remove-pkg': True,
-                   'system-config': True
-                   }
+kettle = Kettle(sys.argv[1])
+config = Config(kettle)
+config.restore_sys_configuration()
 
-    def __init__(self, kettle):
-
-        self.kettle = kettle
-        self.kettle_ark = self.kettle.kettle_ark
-
-    def list_permissions(self):
-        return self.permissions
-
-    def run_install(self):
-        raise NotImplementedError
-
-    def run_dump(self):
-        raise NotImplementedError
