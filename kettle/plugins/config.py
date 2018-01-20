@@ -18,7 +18,7 @@
 #
 # config.py - Kettle configuration files manager
 
-import shutil, os, subprocess
+import shutil, os, subprocess, tarfile
 import logging
 from pathlib import Path
 
@@ -34,8 +34,8 @@ class Config(plugin.Plugin):
         self.log = logging.getLogger("kettle.Plugin.Config")
         self.log.debug(_("Logging set up!"))
         self.permissions = self.kettle.permissions
-        self.sys_config_path = os.path.join(self.kettle.tmppath, "/data/config/system")
-        self.usr_config_path = self.kettle.tmppath + "/data/config/home"
+        self.sys_config_path = os.path.join(self.kettle.tmppath, "/data/config/system.tar")
+        self.usr_config_path = self.kettle.tmppath + "/data/config/home.tar"
         self.has_sys_config = os.path.isdir(self.sys_config_path)
 
         self.user_home = str(Path.home()) + "/"
@@ -43,13 +43,8 @@ class Config(plugin.Plugin):
     def restore_home_configuration(self):
         self.log.info(_("Restoring user configuration"))
         self.kettle.extract_kettle(path=self.kettle.tmppath)
-        for item in os.listdir(self.usr_config_path):
-            s = os.path.join(self.usr_config_path, item)
-            d = os.path.join(self.user_home, item)
-            if os.path.isdir(s):
-                shutil.copytree(s, d)
-            else:
-                shutil.copy2(s, d)
+        usr_config_ark = tarfile.open(self.user_config_path, mode="r")
+        usr_config_ark.extractall(path=self.user_home)
         self.log.info(_("User config restoration complete!"))
 
     def restore_sys_configuration(self):
