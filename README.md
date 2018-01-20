@@ -6,7 +6,7 @@ Kettle is a configuration backup-restore tool for Debian-based OSs like Pop_OS. 
 
 For now, Kettle is distributed as a Python Package. To install it, clone the latest github version and use setup.py
 ```
-git clone https://github.com/freshinstall/kettles
+git clone https://github.com/freshinstall/kettle
 cd kettle
 sudo python3 setup.py install
 kettle --help
