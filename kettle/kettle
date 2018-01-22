@@ -24,7 +24,8 @@ _ = gettext.gettext
 
 from kettle import action, ket
 
-def create(log, path=None, extract_dir=None):
+def create(log, args):
+    path = args.dir
     log.info(_('Creating new kettle: %s' % path))
     try:
         kettle = ket.NewKettle(path)
@@ -38,20 +39,37 @@ def create(log, path=None, extract_dir=None):
     for i in kettle_info:
         print(i)
 
-def pack(log, path=None, extract_dir=None):
-    pass
+def pack(log, args):
+    path = args.dir
+    log.info(_('Packing kettle: %s' % path))
+    try:
+        kettle = ket.NewKettle(path)
+    except Exception as e:
+        log.exception(e)
+        exit()
 
-def extract(log, path=None, extract_dir=None):
+    act = action.Action(kettle)
+    act.create(path)
+    kettle_info = act.info()
+    for i in kettle_info:
+        print(i)
+
+def extract(log, args):
+    path=args.kettle
     try:
         kettle = ket.Kettle(path)
     except Exception as e:
         log.exception(e)
         exit()
-    log.info(_('Extracting kettle %s from %s' % (kettle.get_id(), path)))
+    extract_dir = kettle.tmppath
+    if args.directory:
+        extract_dir = args.directory
+    log.info(_('Extracting kettle %s from %s to %s' % (kettle.get_id(), path, extract_dir)))
     act = action.Action(kettle)
     act.extract(path=extract_dir)
 
-def install(log, path=None, extract_dir=None):
+def install(log, args):
+    path = args.kettle
     try:
         kettle = ket.Kettle(path)
     except Exception as e:
@@ -61,7 +79,8 @@ def install(log, path=None, extract_dir=None):
     act = action.Action(kettle)
     act.install(kettle)
 
-def info(log, path=None, extract_dir=None):
+def info(log, args):
+    path = args.kettle
     try:
         kettle = ket.Kettle(path)
     except Exception as e:
@@ -73,22 +92,11 @@ def info(log, path=None, extract_dir=None):
     for i in kettle_info:
         print(i)
 
-def gui(log, path=None):
+def gui(log, args):
     log.info(_('Running the GUI'))
     log.exception(_('The GUI is not yet implemented, Please use the CLI instead.'))
 
 def main():
-
-    # Set up some basic logging
-    log = logging.getLogger('kettle')
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s %(name)-22s %(levelname)-8s %(message)s')
-    handler.setFormatter(formatter)
-    log.addHandler(handler)
-    log.setLevel(logging.DEBUG)
-    directory=None
-
-    log.debug(_("Logging set up!"))
 
     # Argument processing
     parser = argparse.ArgumentParser(prog="kettle",
@@ -99,8 +107,11 @@ def main():
     parser.add_argument('-v', '--verbose',
                         help=_("Make output more verbose"),
                         action="count")
-    subparsers = parser.add_subparsers(help=_("The command to run"))
+    subparsers = parser.add_subparsers(help=_("The command to run, from below:"),
+                                       dest='action',
+                                       metavar="COMMAND")
 
+    # install subcommand
     parser_install = subparsers.add_parser('install',
                                            help=_("Install a kettle into the system"))
     parser_install.add_argument('kettle', help=_("The kettle to install"))
@@ -121,6 +132,7 @@ def main():
                                        "This is dangerous."),
                                 action="store_true")
 
+    # create subcommand
     parser_create = subparsers.add_parser("create",
                                           help=_("Create a new blank kettle " +
                                                  "folder for customization."))
@@ -131,25 +143,28 @@ def main():
                                       "The new kettle"),
                                action="store_true")
 
+    # pack subcommand
     parser_pack = subparsers.add_parser('pack',
                                         help=_("Compress a directory into a " +
                                                "Kettle file."))
     parser_pack.add_argument('dir', help=_("The directory to pack"))
 
+    # extract subcommand
     parser_extract = subparsers.add_parser('extract',
                                            help=_("Extracts a kettle file"))
     parser_extract.add_argument('kettle', help=_("The kettle to extract"))
     parser_extract.add_argument('-d', '--directory',
-                                help=_("The directory to extract to"))
+                                help=_("The directory to extract to"),
+                                metavar="DIR")
 
+    # info subcommand
     parser_info = subparsers.add_parser('info', help=_("Display kettle metadata."))
     parser_info.add_argument('kettle', help=_("The kettle whose metadata to display."))
 
+    # gui subcommand
     parser_gui = subparsers.add_parser('gui', help=_("Display the kettle GUI"))
 
     args = parser.parse_args()
-
-    self.log.DEBUG(_("Arguments passed: %s" % str(args)))
 
     action = {"create"  : create,
               "extract" : extract,
@@ -159,12 +174,21 @@ def main():
               "pack"    : pack,
     }
     if args.action:
-        log.info(_('Got command: %s' % args.action))
-        log.debug('Destination is %s' % args.directory)
-        if args.directory == None:
-            action[args.action](log, path=args.file)
-        else:
-            action[args.action](log, path=args.file, extract_dir=args.directory)
+        # Set up some basic logging
+        log = logging.getLogger('kettle')
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)s %(name)-22s %(levelname)-8s %(message)s')
+        handler.setFormatter(formatter)
+        log.addHandler(handler)
+        log.setLevel(logging.DEBUG)
+        directory=None
+
+        log.debug(_("Logging set up!"))
+        log.debug(_("Arguments passed: %s" % str(args)))
+        log.debug(_('Got command: %s' % args.action))
+        action[args.action](log, args)
+    else:
+        parser.print_help()
 
 if __name__ == "__main__":
     main()
