@@ -54,10 +54,12 @@ class Config(plugin.Plugin):
 
     def get_to_root(self):
         self.log.info(_("Restoring system configuration"))
-        subprocess.call(["/usr/bin/sudo",
+        output = subprocess.Popen(["/usr/bin/sudo",
                          "/usr/bin/python3",
                          self.plugin_path + "/config-data/as_root.py",
-                         self.kettle.path])
+                         self.kettle.path], stdout=subprocess.PIPE)
+        for line in output.stdout:
+            print(line.decode("UTF-8")[:-1])
         self.log.info(_("System config restoration complete!"))
 
     def run_install(self):

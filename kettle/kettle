@@ -38,6 +38,9 @@ def create(log, path=None, extract_dir=None):
     for i in kettle_info:
         print(i)
 
+def pack(log, path=None, extract_dir=None):
+    pass
+
 def extract(log, path=None, extract_dir=None):
     try:
         kettle = ket.Kettle(path)
@@ -90,32 +93,70 @@ def main():
     # Argument processing
     parser = argparse.ArgumentParser(prog="kettle",
                                      description=_('Desktop configuration manager'),
+                                     epilog=_("For help with particular commands, "+
+                                              "run `kettle COMMAND --help`")
                                      )
-    parser.add_argument('action',
-                        nargs='?',
-                        default='gui',
-                        help=_('What action to do.'),
-                        metavar='COMMAND',
-                        )
-    parser.add_argument('file',
-                        nargs='?',
-                        default=os.getcwd(),
-                        help=_('The path to operate with. Defaults to current directory.'),
-                        metavar='PATH',
-                        )
-    parser.add_argument('-d', '--directory',
-                        default=None,
-                        type=str,
-                        help=_('The directory to extract the kettle to or create it from.'),
-                        dest=directory,
-                        )
+    parser.add_argument('-v', '--verbose',
+                        help=_("Make output more verbose"),
+                        action="count")
+    subparsers = parser.add_subparsers(help=_("The command to run"))
+
+    parser_install = subparsers.add_parser('install',
+                                           help=_("Install a kettle into the system"))
+    parser_install.add_argument('kettle', help=_("The kettle to install"))
+    parser_install.add_argument('-p', '--plugins',
+                                help=_("A quote-wrapped, comma separated list " +
+                                       "of plugins to install. Overrides the " +
+                                       "list in the kettle"))
+    parser_install.add_argument('-y', '--force-yes',
+                                help=_("Automatically answer \"yes\" to any " +
+                                       "plugin loading prompts. This does not " +
+                                       "affect prompts from the script plugin"),
+                                action="store_true")
+    parser_install.add_argument('-n', '--force-no',
+                                help=_("The opposite of -y"),
+                                action="store_true")
+    parser_install.add_argument('-s', '--dangerous',
+                                help=_("Run scripts without verification. " +
+                                       "This is dangerous."),
+                                action="store_true")
+
+    parser_create = subparsers.add_parser("create",
+                                          help=_("Create a new blank kettle " +
+                                                 "folder for customization."))
+    parser_create.add_argument('-i', '--id',
+                               help=_("The ID of the new kettle"))
+    parser_create.add_argument('-b', '--backup',
+                               help=_("Backs up the current system config into " +
+                                      "The new kettle"),
+                               action="store_true")
+
+    parser_pack = subparsers.add_parser('pack',
+                                        help=_("Compress a directory into a " +
+                                               "Kettle file."))
+    parser_pack.add_argument('dir', help=_("The directory to pack"))
+
+    parser_extract = subparsers.add_parser('extract',
+                                           help=_("Extracts a kettle file"))
+    parser_extract.add_argument('kettle', help=_("The kettle to extract"))
+    parser_extract.add_argument('-d', '--directory',
+                                help=_("The directory to extract to"))
+
+    parser_info = subparsers.add_parser('info', help=_("Display kettle metadata."))
+    parser_info.add_argument('kettle', help=_("The kettle whose metadata to display."))
+
+    parser_gui = subparsers.add_parser('gui', help=_("Display the kettle GUI"))
+
     args = parser.parse_args()
+
+    self.log.DEBUG(_("Arguments passed: %s" % str(args)))
 
     action = {"create"  : create,
               "extract" : extract,
               "gui"     : gui,
               "install" : install,
               "info"    : info,
+              "pack"    : pack,
     }
     if args.action:
         log.info(_('Got command: %s' % args.action))

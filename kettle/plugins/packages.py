@@ -106,10 +106,12 @@ class Packages(plugin.Plugin):
             self.cache_unlock()
 
     def get_to_root(self):
-        subprocess.call(["/usr/bin/sudo",
+        output = subprocess.Popen(["/usr/bin/sudo",
                          "/usr/bin/python3",
                          self.plugin_path + "/packages-data/as_root.py",
-                         self.kettle.path])
+                         self.kettle.path], stdout=subprocess.PIPE)
+        for line in output.stdout:
+            print(line.decode("UTF-8")[:-1])
     def run_install(self):
         #code goes here
         self.get_to_root()
