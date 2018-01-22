@@ -43,7 +43,7 @@ class Config(plugin.Plugin):
     def restore_home_configuration(self):
         self.log.info(_("Restoring user configuration"))
         self.kettle.extract_kettle(path=self.kettle.tmppath)
-        usr_config_ark = tarfile.open(self.user_config_path, mode="r")
+        usr_config_ark = tarfile.open(self.usr_config_path, mode="r")
         usr_config_ark.extractall(path=self.user_home)
         self.log.info(_("User config restoration complete!"))
 
