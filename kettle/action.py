@@ -25,7 +25,7 @@ _ = gettext.gettext
 # generic action class
 class Action():
 
-    trusted_plugins = ['packages', 'repos']
+    trusted_plugins = ['packages', 'repos', 'config']
     untrusted_response = {"Y" : True,
                           "y" : True,
                           "yes" : True,
