@@ -26,16 +26,15 @@ from kettle import action, ket
 
 def create(log, args):
     path = args.dir
-    log.info(_('Creating new kettle: %s' % path))
+    log.info(_('Creating new empty kettle: %s' % path))
     try:
-        kettle = ket.NewKettle(path)
+        kettle = ket.KettleTemplate(path)
     except Exception as e:
         log.exception(e)
         exit()
 
-    act = action.Action(kettle)
-    act.create(path)
-    kettle_info = act.info()
+    kettle.make_paths()
+    kettle_info = kettle.info()
     for i in kettle_info:
         print(i)
 
@@ -49,7 +48,7 @@ def pack(log, args):
         exit()
 
     act = action.Action(kettle)
-    act.create(path)
+    act.pack(path)
     kettle_info = act.info()
     for i in kettle_info:
         print(i)

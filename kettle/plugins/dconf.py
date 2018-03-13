@@ -17,6 +17,8 @@
 # PERFORMANCE OF THIS SOFTWARE.
 #
 # config.py - Kettle configuration files manager
+# Currently doesn't back up. To create a list for this plugin, use
+# dconf dump /
 
 import subprocess
 import logging

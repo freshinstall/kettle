@@ -23,97 +23,108 @@ import yaml
 import glob, os
 import logging
 
-import gettext
-_ = gettext.gettext
-
 class BadKettle(Exception):
     pass
 
 class Kettle():
-    name = ""
-    ketid = ""
-    plugins = []
-    permissions = {}
-    standard = 0
-    tmppath = "/tmp/kettle/"
-    kettle_yaml = []
+    kettle_yaml = {}
+    path = '/tmp/kettle'
+    data_path = '/tmp/kettle/data'
+    meta_path = '/tmp/kettle/metainfo'
+    kettle_ark = ""
 
     def __init__(self, path):
+
         self.path = path
+        self.kettle_ark = self.ark_open()
+        self.kettle_yaml = self.get_yaml()
 
+
+    def ark_open(self):
         try:
-            self.kettle_ark = tarfile.open(name=self.path, mode='r')
-        except FileNotFoundError:
-            raise BadKettle(_('The kettle doesn\'t exist'))
+            archive = tarfile.open(name=self.path, mode='r')
+        except FileNotFoundError as e:
+            raise BadKettle('The file doesn\'t exist')
 
-        self.get_yaml()
-        self.get_name()
-        self.get_id()
-        self.get_plugins()
-        self.get_permissions()
+        return archive
 
-        self.tmppath = "/tmp/kettle/%s" % self.ketid
+    def ark_close(self):
+        self.kettle_ark.close()
 
     def get_yaml(self):
         try:
             kettle_yaml_info = self.kettle_ark.getmember('metainfo/meta.yaml')
-        except KeyError:
-            raise BadKettle(_("The kettle is missing meta.yaml"))
+        except KeyError as e:
+            raise BadKettle('The kettle is missing meta.yaml')
 
-        kettle_yaml_b = self.kettle_ark.extractfile(kettle_yaml_info)
-        self.kettle_yaml = yaml.safe_load(kettle_yaml_b)
+        kettle_yaml_bytes = self.kettle_ark.extractfile(kettle_yaml_info)
+        kettle_yaml = yaml.safe_load(kettle_yaml_bytes)
 
-        return self.kettle_yaml
+        return kettle_yaml
 
-    def get_name(self):
-        self.name = self.kettle_yaml['name']
-        return self.name
+    def set_paths(self):
+        self.data_path = os.path.join(self.path, 'data')
+        self.meta_path = os.path.join(self.path, 'metainfo')
 
-    def get_id(self):
-        self.ketid = self.kettle_yaml['id']
-        return self.ketid
+    def info(self):
+        kettle_info = []
+        kettle_info.append(_('Kettle Information:'))
+        kettle_info.append(_('  ID: %s' % self.kettle.ketid))
+        kettle_info.append(_('  Name: %s' % self.kettle.name))
+        kettle_info.append(_('  Author: %s <%s>' % (self.kettle.get_info('author'),
+                                                 self.kettle.get_info('email'))))
+        kettle_info.append(_('  URL: %s' % self.kettle.get_info('URL')))
+        kettle_info.append(_('  Version: %s' % self.kettle.get_info('version')))
+        kettle_info.append(_('Plugins:'))
+        for plugin in self.kettle.plugins:
+            plugin_trusted = _("Untrusted")
+            if plugin in self.trusted_plugins:
+                plugin_trusted = _("Trusted")
+            plugin_info = '        %s, %s' % (plugin, plugin_trusted)
+            kettle_info.append(plugin_info)
+        kettle_info.append(_('Permissions Requested:'))
+        for i in self.kettle.permissions:
+            if self.kettle.permissions[i] == True:
+                permission = '        %s' % i
+                kettle_info.append(permission)
+        return kettle_info
 
-    def get_plugins(self):
-        self.plugins = self.kettle_yaml['plugins']
-        return self.plugins
 
-    def get_permissions(self):
-        self.permissions = self.kettle_yaml['permissions']
-        return self.permissions
+class KettleTemplate(Kettle):
+    kettle_yaml = {
+        'name': 'New Kettle',
+        'id': 'new-kettle',
+        'description': 'A Kettle to test things out.\n',
+        'author': 'kettle',
+        'URL': 'https://github.com/freshinstall/kettle',
+        'email': 'email@domain',
+        'version': '1.0',
+        'standard': 0,
+        'plugins': ['repos', 'packages', 'config', 'dconf'],
+        'permissions': {
+            'script': False,
+            'root': False,
+            'remove-pkg': False,
+            'system-config': False}}
 
-    def get_info(self, key):
-        return self.kettle_yaml[key]
+    def __init__(self, path='/tmp/kettle', name='New Kettle',
+                 ketid='new-kettle', description="New Kettle", author='Kettle',
+                 email='kettle@example.com',
+                 url='https://github.com/freshinstall/kettle', version='1.0'):
 
-    def extract_kettle(self, path=tmppath):
-        self.kettle_ark.extractall(path=path)
-
-class NewKettle(Kettle):
-
-    def __init__(self, path):
         self.log = logging.getLogger('kettle.NewKettle')
-        self.log.debug(_("Logging set up!"))
+
+        self.kettle_yaml['name'] = name
+        self.kettle_yaml['id'] = ketid
+        self.kettle_yaml['author'] = author
+        self.kettle_yaml['email'] = email
+        self.kettle_yaml['version'] = version
+        self.kettle_yaml['URL'] = url
+
         self.path = path
-        self.get_yaml()
-        self.get_name()
-        self.get_id()
-        self.get_plugins()
-        self.get_permissions()
-        kettle_filename = ("%s.ket" % self.ketid)
+        self.set_paths()
 
-        try:
-            self.kettle_ark = tarfile.open(name=kettle_filename, mode='x')
-        except FileExistsError:
-            raise BadKettle(_('That kettle already exists!'))
-
-    def get_yaml(self):
-        with open(os.path.join(self.path, "metainfo/meta.yaml")) as f:
-            self.kettle_yaml = yaml.safe_load(f)
-
-    def create(self):
-        self.log.info(_("Adding %s to kettle" % self.path))
-        os.chdir(self.path)
-        self.kettle_ark.add("data")
-        self.kettle_ark.add("metainfo")
-
-    def close(self):
-        self.kettle_ark.close()
+    def make_paths(self):
+        os.makedirs(self.path)
+        os.makedirs(self.data_path)
+        os.makedirs(self.meta_path)

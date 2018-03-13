@@ -42,10 +42,19 @@ class Action():
 
         self.kettle = kettle
 
-    def create(self, path):
+    def create(self, path, name):
         self.log.debug(_("Starting creation of new kettle:  %s" % path))
 
-        # do some stuff
+        plugins = self.kettle.plugins
+
+
+        # Set up folders
+
+        os.makedirs(self.kettle.path, exist_ok=False)
+        os.makedirs(os.path.join(name, 'data'), exist_ok=False)
+        for plugin in self.trusted_plugins:
+            f
+
 
         self.log.debug(_("%s created!" % path))
 
@@ -80,7 +89,7 @@ class Action():
                 current_object.run_install()
                 self.log.info(_("plugin %s complete!" % plugin))
             except ModuleNotFoundError:
-                self.log.error(_("Couldn't find plugin: %s" % plugin))
+                self.log.warning(_("Couldn't find plugin: %s" % plugin))
                 pass
         self.log.debug(_('Installed %s' % self.kettle.ketid))
     
@@ -107,7 +116,7 @@ class Action():
                 kettle_info.append(permission)
         return kettle_info
 
-    def create(self, path):
+    def pack(self, path):
         self.log.debug(_("Starting creation of new kettle:  %s" % self.kettle.ketid))
 
         # do some stuff
