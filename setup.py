@@ -20,7 +20,7 @@ from distutils.core import setup
 
 setup(
     name = 'kettle',
-    version = '0.0.1',
+    version = '0.0.2',
     author = 'kettle',
     description = 'Kettle is a desktop configuration manager',
     url = 'https://github.com/freshinstall/freshinstall',

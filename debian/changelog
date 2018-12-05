@@ -1,0 +1,11 @@
+kettle (0.0.2) cosmic; urgency=medium
+
+  * Added Debian Packaging
+
+ -- Ian Santopietro <ian@system76.com>  Wed, 05 Dec 2018 11:51:48 -0700
+
+kettle (0.0.1-1) cosmic; urgency=medium
+
+  * Initial release 
+
+ -- Ian Santopietro <ian@system76.com>  Wed, 05 Dec 2018 10:46:05 -0700
